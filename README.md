@@ -2,7 +2,7 @@
 
 [![Hackage](https://img.shields.io/hackage/v/concurrency-benchmarks.svg?style=flat)](https://hackage.haskell.org/package/concurrency-benchmarks)
 [![Build Status](https://travis-ci.org/composewell/concurrency-benchmarks.svg?branch=master)](https://travis-ci.org/composewell/concurrency-benchmarks)
-[![Windows Build status](https://ci.appveyor.com/api/projects/status/5u19xvm7sn7salrh?svg=true)](https://ci.appveyor.com/project/harendra-kumar/concurrency-benchmarks)
+[![Windows Build status](https://ci.appveyor.com/api/projects/status/wqban615v9f21xqi?svg=true)](https://ci.appveyor.com/project/harendra-kumar/concurrency-benchmarks)
 
 Benchmarks to compare the pure concurrency overhead of various flavors of
 concurrent [streamly](https://github.com/composewell/streamly) streams and the
