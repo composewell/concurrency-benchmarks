@@ -8,24 +8,49 @@ Benchmarks to compare the pure concurrency overhead of various flavors of
 concurrent [streamly](https://github.com/composewell/streamly) streams and the
 [async](https://hackage.haskell.org/package/async) package.
 
-Use `cabal new-bench` or `stack bench` to run the benchmarks. To generate
+Run the `run.sh` script to run the benchmarks and create the charts. You can
+use `cabal new-bench` or `stack bench` to run the benchmarks. To generate
 charts, run the benchmarks with `--csv-raw=results.csv` option and then run
 `makecharts results.csv`. Charts are generated in the `charts` directory.
 
 ## Methodology
 
-A total of 100,000 tasks are run for each concurrency mechanism being compared.
-Each task is a noop i.e. it does nothing, just returns. Therefore the benchmark
-measures the pure overhead of concurrency for the tiniest possible tasks.
+A total of 10,000 tasks are run for each concurrency mechanism being compared.
+Two independent experiments are performed:
 
-Streamly's `async` and `ahead` style streams may automatically run the tasks in
-less number of threads than the actual number of tasks i.e. they may run
-multiple tasks per thread, if the tasks do not block and have a very low
-latency. Therefore these streams are much faster on this benchmark.  However,
-the streamly `parallel` style stream guarantees that each task runs in a
-separate thread however small it is. For the `async` package,
-`mapConcurrently_` is used, which runs the tasks but does not collect the
-results.
+1. In the first experiment, each task is just a noop i.e. it takes almost 0 time
+   to execute.
+2. In the second experiment, each task introduces a 5 second delay
+
+The first case shows streamly's smart scheduling to automatically run the tasks
+in less number of threads than the actual number of tasks.  When the tasks do
+not block and have a very low latency, streamly may run multiple tasks per
+thread.  Therefore streamly is much faster on this benchmark.
+
+In the second case a 5 second delay is introduced to make sure that streamly
+uses one thread per task which is similar to what `async` does and therefore a
+fair comparison.  For the `async` package, `mapConcurrently` is used which can
+be compared with streamly's `ahead` style stream.
+
+For streamly this is the code that is benchmarked, by default streamly has a
+limit on the buffer size and the number of threads, we set those limits to `-1`
+which means there is no limit:
+
+```haskell
+    let work = (\i -> threadDelay 5000000 >> return i)
+    in runStream
+        $ aheadly
+        $ maxBuffer (-1)
+        $ maxThreads (-1)
+        $ S.fromFoldableM $ map work [1..10000]
+```
+
+For `async` this is the code that is benchmarked:
+
+```haskell
+    let work = (\i -> threadDelay 5000000 >> return i)
+    mapConcurrently work [1..10000]
+```
 
 ## Results
 
@@ -33,14 +58,30 @@ These charts compare the [streamly master
 branch](https://github.com/composewell/streamly/commit/d73041c957d4211a6dc89624f0ebff54178bda6a)
 and `async-2.2.1` on a MacBook Pro with a 2.2 GHz Intel Core i7 processor.
 
-This chart shows the time taken for the benchmark completion.
+For compilation `-threaded -with-rtsopts "-N"` GHC options were used to enable
+the use of multiple processor cores in parallel.
 
-[![Comparison of time](https://github.com/composewell/concurrency-benchmarks/blob/master/charts/Concurrencyoverhead-time.svg)](https://github.com/composewell/concurrency-benchmarks/blob/master/charts/Concurrencyoverhead-time.svg)
+For streamly, results for both `async` and `ahead` style streams are shown.
 
-This chart shows the maximum rss (resident set size), in other words peak
-memory consumed during the benchmark run.
+### Zero delay case
 
-[![Comparison of maxrss](https://github.com/composewell/concurrency-benchmarks/blob/master/charts/Concurrencyoverhead-maxrss.svg)](https://github.com/composewell/concurrency-benchmarks/blob/master/charts/Concurrencyoverhead-maxrss.svg)
+#### Peak Memory Consumed
+
+[![Comparison of maxrss](https://github.com/composewell/concurrency-benchmarks/blob/master/charts/10,000tasks,0secdelay-maxrss.svg)](https://github.com/composewell/concurrency-benchmarks/blob/master/charts/10,000tasks,0secdelay-maxrss.svg)
+
+#### Time Taken
+
+[![Comparison of time](https://github.com/composewell/concurrency-benchmarks/blob/master/charts/10,000tasks,0secdelay-time.svg)](https://github.com/composewell/concurrency-benchmarks/blob/master/charts/10,000tasks,0secdelay-time.svg)
+
+### 5 second delay case
+
+#### Peak Memory Consumed
+
+[![Comparison of maxrss](https://github.com/composewell/concurrency-benchmarks/blob/master/charts/10,000tasks,5secdelay-maxrss.svg)](https://github.com/composewell/concurrency-benchmarks/blob/master/charts/10,000tasks,5secdelay-maxrss.svg)
+
+#### Time Taken
+
+[![Comparison of time](https://github.com/composewell/concurrency-benchmarks/blob/master/charts/10,000tasks,5secdelay-time.svg)](https://github.com/composewell/concurrency-benchmarks/blob/master/charts/10,000tasks,5secdelay-time.svg)
 
 ## Feedback
 

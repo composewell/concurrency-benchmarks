@@ -5,38 +5,70 @@
 -- License     : BSD3
 -- Maintainer  : harendra.kumar@gmail.com
 
+import Control.Concurrent
+import Control.Concurrent.Async
+import Control.Monad (when)
+import System.Random (randomRIO)
+
 import Gauge
 import Streamly
-import System.Random (randomRIO)
-import Control.Concurrent.Async
-
-count :: Int
-count = 100000
+import qualified Streamly.Prelude as S
 
 -------------------------------------------------------------------------------
 -- Append
 -------------------------------------------------------------------------------
 
 {-# INLINE append #-}
-append
-    :: (Monoid (t IO Int), Monad (t IO))
-    => (t IO Int -> SerialT IO Int) -> IO ()
-append t = randomRIO (1,1) >>= \x -> runStream $ t $ foldMap return [x..count]
+append :: IsStream t => Int -> Int -> (t IO Int -> SerialT IO Int) -> IO ()
+append tcount d t = randomRIO (1,1) >>= \x ->
+    let work = (\i -> when (d /= 0) (threadDelay d) >> return i)
+    in runStream
+        $ t
+        $ maxBuffer (-1)
+        $ maxThreads (-1)
+        $ S.fromFoldableM $ map work [x..tcount]
+
+mkBgroup :: Int -> Int -> [Benchmark]
+mkBgroup d n =
+    let work = (\i -> when (d /= 0) (threadDelay d) >> return i)
+    in [ bgroup "streamly"
+        [ bench "ahead"    $ nfIO $ append n d aheadly
+        , bench "async"    $ nfIO $ append n d asyncly
+        -- , bench "wAsync"   $ nfIO $ append n d wAsyncly
+        -- , bench "parallel" $ nfIO $ append n d parallely
+        ]
+        , bgroup "async"
+        [ bench "mapConcurrently_" $ nfIO $ mapConcurrently_ work [1..n]
+        , bench "mapConcurrently"  $ nfIO $ mapConcurrently work [1..n]
+        ]
+       ]
 
 main :: IO ()
 main = do
   defaultMain
-    [
-      bgroup "streamly"
-      [ bench "serial"   $ nfIO $ append serially
-      , bench "wSerial"  $ nfIO $ append wSerially
-      , bench "ahead"    $ nfIO $ append aheadly
-      , bench "async"    $ nfIO $ append asyncly
-      , bench "wAsync"   $ nfIO $ append wAsyncly
-      , bench "parallel" $ nfIO $ append parallely
-      ]
-      , bgroup "async"
-      [ bench "mapConcurrently_" $ nfIO $ mapConcurrently_ return [1..count]
-      , bench "mapConcurrently" $ nfIO $ mapConcurrently return [1..count]
-      ]
+    [ -- bgroup "delay-0ms-1k"    (mkBgroup 0     1000)
+      bgroup "delay-0ms-10k"   (mkBgroup 0     10000)
+      {-
+    , bgroup "delay-0ms-100k"  (mkBgroup 0     100000)
+
+    , bgroup "delay-1ms-1k"    (mkBgroup 1000   1000)
+    , bgroup "delay-1ms-10k"   (mkBgroup 1000   10000)
+    , bgroup "delay-1ms-100k"  (mkBgroup 1000   100000)
+
+    , bgroup "delay-10ms-1k"   (mkBgroup 10000  1000)
+    , bgroup "delay-10ms-10k"  (mkBgroup 10000  10000)
+    , bgroup "delay-10ms-100k" (mkBgroup 10000  100000)
+
+    , bgroup "delay-100ms-1k"   (mkBgroup 100000 1000)
+    , bgroup "delay-100ms-10k"  (mkBgroup 100000 10000)
+    , bgroup "delay-100ms-100k" (mkBgroup 100000 100000)
+
+    , bgroup "delay-1000ms-1k"   (mkBgroup 1000000 1000)
+    , bgroup "delay-1000ms-10k"  (mkBgroup 1000000 10000)
+    , bgroup "delay-1000ms-100k" (mkBgroup 1000000 100000)
+
+    , bgroup "delay-5000ms-1k"   (mkBgroup 5000000 1000)
+    -}
+    , bgroup "delay-5000ms-10k"  (mkBgroup 5000000 10000)
+    -- , bgroup "delay-5000ms-100k" (mkBgroup 5000000 100000)
    ]
