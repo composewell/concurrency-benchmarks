@@ -81,6 +81,13 @@ For streamly, results for both `async` and `ahead` style streams are shown.
 
 #### Time Taken
 
+Note, this time shows the overhead only and not the full time taken by the
+benchmark. For example the actual time taken by the `async` benchmark is
+`5.131` seconds, but since 5 second in this is the delay introduced by each
+parallel task, we compute the overhead of concurrency by deducting the 5
+seconds from the actual time taken, so the overhead is `131 ms` in case of
+`async`.
+
 [![Comparison of time](https://github.com/composewell/concurrency-benchmarks/blob/master/charts/10,000tasks,5secdelay-time.svg)](https://github.com/composewell/concurrency-benchmarks/blob/master/charts/10,000tasks,5secdelay-time.svg)
 
 ## Feedback
