@@ -54,11 +54,11 @@ For `async` this is the code that is benchmarked:
 
 ## Results
 
-These charts compare the [streamly master
-branch](https://github.com/composewell/streamly/commit/d73041c957d4211a6dc89624f0ebff54178bda6a)
-and `async-2.2.1` on a MacBook Pro with a 2.2 GHz Intel Core i7 processor.
+These charts compare
+[streamly-0.5.1](https://hackage.haskell.org/package/streamly) and
+`async-2.2.1` on a MacBook Pro with a 2.2 GHz Intel Core i7 processor.
 
-For compilation `-threaded -with-rtsopts "-N"` GHC options were used to enable
+When compiling, `-threaded -with-rtsopts "-N"` GHC options were used to enable
 the use of multiple processor cores in parallel.
 
 For streamly, results for both `async` and `ahead` style streams are shown.
@@ -67,17 +67,17 @@ For streamly, results for both `async` and `ahead` style streams are shown.
 
 #### Peak Memory Consumed
 
-[![Comparison of maxrss](https://github.com/composewell/concurrency-benchmarks/blob/master/charts/10,000tasks,0secdelay-maxrss.svg)](https://github.com/composewell/concurrency-benchmarks/blob/master/charts/10,000tasks,0secdelay-maxrss.svg)
+<img src="https://github.com/composewell/concurrency-benchmarks/blob/master/charts/10,000tasks,0secdelay-maxrss.svg" alt="Comparison of maxrss" width="640"/>
 
 #### Time Taken
 
-[![Comparison of time](https://github.com/composewell/concurrency-benchmarks/blob/master/charts/10,000tasks,0secdelay-time.svg)](https://github.com/composewell/concurrency-benchmarks/blob/master/charts/10,000tasks,0secdelay-time.svg)
+<img src="https://github.com/composewell/concurrency-benchmarks/blob/master/charts/10,000tasks,0secdelay-time.svg" alt="Comparison of time" width="640"/>
 
 ### 5 second delay case
 
 #### Peak Memory Consumed
 
-[![Comparison of maxrss](https://github.com/composewell/concurrency-benchmarks/blob/master/charts/10,000tasks,5secdelay-maxrss.svg)](https://github.com/composewell/concurrency-benchmarks/blob/master/charts/10,000tasks,5secdelay-maxrss.svg)
+<img src="https://github.com/composewell/concurrency-benchmarks/blob/master/charts/10,000tasks,5secdelay-maxrss.svg" alt="Comparison of maxrss" width="640"/>
 
 #### Time Taken
 
@@ -88,7 +88,7 @@ parallel task, we compute the overhead of concurrency by deducting the 5
 seconds from the actual time taken, so the overhead is `131 ms` in case of
 `async`.
 
-[![Comparison of time](https://github.com/composewell/concurrency-benchmarks/blob/master/charts/10,000tasks,5secdelay-time.svg)](https://github.com/composewell/concurrency-benchmarks/blob/master/charts/10,000tasks,5secdelay-time.svg)
+<img src="https://github.com/composewell/concurrency-benchmarks/blob/master/charts/10,000tasks,5secdelay-time.svg" alt="Comparison of time" width="640"/>
 
 ## Feedback
 
