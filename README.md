@@ -4,9 +4,15 @@
 [![Build Status](https://travis-ci.org/composewell/concurrency-benchmarks.svg?branch=master)](https://travis-ci.org/composewell/concurrency-benchmarks)
 [![Windows Build status](https://ci.appveyor.com/api/projects/status/wqban615v9f21xqi?svg=true)](https://ci.appveyor.com/project/harendra-kumar/concurrency-benchmarks)
 
-Benchmarks to compare the pure concurrency overhead of various flavors of
+Benchmarks to compare the concurrency overhead of
 concurrent [streamly](https://github.com/composewell/streamly) streams and the
-[async](https://hackage.haskell.org/package/async) package.
+[async](https://hackage.haskell.org/package/async) package. If you are familiar
+with `async`, see [this quick
+guide](https://github.com/composewell/streamly/blob/master/docs/Async.md) for
+equivalent features of streamly. For more detailed introduction to streamly see
+[this tutorial](https://hackage.haskell.org/package/streamly/docs/Streamly-Tutorial.html).
+
+## How to run
 
 Run the `run.sh` script to run the benchmarks and create the charts. You can
 use `cabal new-bench` or `stack bench` to run the benchmarks. To generate
