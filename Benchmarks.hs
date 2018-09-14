@@ -9,6 +9,7 @@ import Control.Concurrent
 import Control.Concurrent.Async
 import Control.Monad (when)
 import System.Random (randomRIO)
+import Data.IORef
 
 import Gauge
 import Streamly
@@ -71,4 +72,19 @@ main = do
     -}
     , bgroup "delay-5000ms-10k"  (mkBgroup 5000000 10000)
     -- , bgroup "delay-5000ms-100k" (mkBgroup 5000000 100000)
+    , bgroup "forkIO-5000ms-10k" $
+    let delay = threadDelay 5000000
+        count = 10000 :: Int
+        list = [1..count]
+        work i = delay >> return i
+    in
+    [ bench "discard" $ nfIO $ do
+        mapM_ (\i -> forkIO $ work i >> return ()) list
+        threadDelay 6000000
+    , bench "collect" $ nfIO $ do
+        ref <- newIORef []
+        mapM_ (\i -> forkIO $ work i >>=
+               \j -> atomicModifyIORef ref $ \xs -> (j : xs, ())) list
+        threadDelay 6000000
+    ]
    ]
