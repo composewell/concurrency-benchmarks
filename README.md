@@ -19,6 +19,10 @@ use `cabal new-bench` or `stack bench` to run the benchmarks. To generate
 charts, run the benchmarks with `--csv-raw=results.csv` option and then run
 `makecharts results.csv`. Charts are generated in the `charts` directory.
 
+IMPORTANT NOTE: THE `maxrss` FIGURES REPORTED BY GAUGE WILL NOT BE CORRECT
+UNLESS YOU RUN ONE BENCHMARK AT A TIME. This is because `maxrss` is tracked per
+process.
+
 ## Methodology
 
 A total of 10,000 tasks are run for each concurrency mechanism being compared.
