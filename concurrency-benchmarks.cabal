@@ -25,6 +25,17 @@ extra-source-files:
   Changelog.md
   README.md
   stack.yaml
+  .github/workflows/packcheck.yml
+  appveyor.yml
+  run.sh
+  shell.nix
+
+extra-doc-files:
+  "charts/10,000tasks,0secdelay-maxrss.svg"
+  "charts/10,000tasks,0secdelay-time.svg"
+  "charts/10,000tasks,5secdelay-maxrss.svg"
+  "charts/10,000tasks,5secdelay-time.svg"
+  charts/results.csv
 
 source-repository head
   type: git
