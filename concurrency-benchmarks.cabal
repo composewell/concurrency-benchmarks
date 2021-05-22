@@ -29,6 +29,7 @@ extra-source-files:
   appveyor.yml
   run.sh
   shell.nix
+  cabal.project
 
 extra-doc-files:
   "charts/10,000tasks,0secdelay-maxrss.svg"
