@@ -12,8 +12,9 @@ import System.Random (randomRIO)
 import Data.IORef
 
 import Gauge
-import Streamly
-import qualified Streamly.Prelude as S
+import Streamly.Prelude as S
+
+import Prelude as P
 
 -------------------------------------------------------------------------------
 -- Append
@@ -23,18 +24,18 @@ import qualified Streamly.Prelude as S
 append :: IsStream t => Int -> Int -> (t IO Int -> SerialT IO Int) -> IO ()
 append tcount d t = randomRIO (1,1) >>= \x ->
     let work = (\i -> when (d /= 0) (threadDelay d) >> return i)
-    in runStream
+    in drain
         $ t
         $ maxBuffer (-1)
         $ maxThreads (-1)
-        $ S.fromFoldableM $ map work [x..tcount]
+        $ S.fromFoldableM $ P.map work [x..tcount]
 
 mkBgroup :: Int -> Int -> [Benchmark]
 mkBgroup d n =
     let work = (\i -> when (d /= 0) (threadDelay d) >> return i)
     in [ bgroup "streamly"
-        [ bench "ahead"    $ nfIO $ append n d aheadly
-        , bench "async"    $ nfIO $ append n d asyncly
+        [ bench "ahead"    $ nfIO $ append n d fromAhead
+        , bench "async"    $ nfIO $ append n d fromAsync
         -- , bench "wAsync"   $ nfIO $ append n d wAsyncly
         -- , bench "parallel" $ nfIO $ append n d parallely
         ]
@@ -73,17 +74,17 @@ main = do
     , bgroup "delay-5000ms-10k"  (mkBgroup 5000000 10000)
     -- , bgroup "delay-5000ms-100k" (mkBgroup 5000000 100000)
     , bgroup "forkIO-5000ms-10k" $
-    let delay = threadDelay 5000000
+    let delay_ = threadDelay 5000000
         count = 10000 :: Int
         list = [1..count]
-        work i = delay >> return i
+        work i = delay_ >> return i
     in
     [ bench "discard" $ nfIO $ do
-        mapM_ (\i -> forkIO $ work i >> return ()) list
+        P.mapM_ (\i -> forkIO $ work i >> return ()) list
         threadDelay 6000000
     , bench "collect" $ nfIO $ do
         ref <- newIORef []
-        mapM_ (\i -> forkIO $ work i >>=
+        P.mapM_ (\i -> forkIO $ work i >>=
                \j -> atomicModifyIORef ref $ \xs -> (j : xs, ())) list
         threadDelay 6000000
     ]
