@@ -1,7 +1,7 @@
 #!/bin/bash
 
 print_help () {
-  echo "Usage: $0 [--append] [--no-graphs] [--no-measure] -- <gauge options>"
+  echo "Usage: $0 [--append] [--no-graphs] [--no-measure] [--use-fusion-plugin] -- <gauge options>"
   echo
   echo "Any arguments after a '--' are passed directly to guage"
   echo "You can omit '--' if the gauge args used do not start with a '-'."
@@ -15,6 +15,7 @@ die () {
 }
 
 QUICK=1
+STACK_OPTS=""
 
 while test -n "$1"
 do
@@ -23,6 +24,9 @@ do
     --append) APPEND=1; shift ;;
     --no-graphs) GRAPH=0; shift ;;
     --no-measure) MEASURE=0; shift ;;
+    --use-fusion-plugin)
+        STACK_OPTS="$STACK_OPTS --flag concurrency-benchmarks:fusion-plugin";
+        shift ;;
     --) shift; break ;;
     -*|--*) print_help ;;
     *) break ;;
@@ -40,7 +44,7 @@ then
 fi
 
 echo "Using stack command [$STACK]"
-$STACK build --bench --no-run-benchmarks || die "build failed"
+$STACK build --bench --no-run-benchmarks $STACK_OPTS || die "build failed"
 
 # We run the benchmarks in isolation in a separate process so that different
 # benchmarks do not interfere with other. To enable that we need to pass the
