@@ -114,7 +114,7 @@ jobs:
           - name: ci
             ghc_version: 8.8.4
             pack_options: >-
-              CABAL_BUILD_OPTIONS="--flag dev"
+              CABAL_BUILD_OPTIONS="--flag dev --flag fusion-plugin"
 
           # - name: ci
           #   ghc_version: 8.4.4
