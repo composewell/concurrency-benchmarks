@@ -18,13 +18,24 @@ description:
   charts, run the benchmarks with @--csv-raw=results.csv@ option and then run
   @makecharts results.csv@. Charts are generated in the @charts@ directory.
 
-cabal-version: >= 1.10
+cabal-version: >= 1.18
 tested-with: GHC==8.2.2, GHC==8.4.3
 build-type:    Simple
 extra-source-files:
   Changelog.md
   README.md
   stack.yaml
+
+  appveyor.yml
+  run.sh
+  cabal.project
+
+extra-doc-files:
+  "charts/10,000tasks,0secdelay-maxrss.svg"
+  "charts/10,000tasks,0secdelay-time.svg"
+  "charts/10,000tasks,5secdelay-maxrss.svg"
+  "charts/10,000tasks,5secdelay-time.svg"
+  charts/results.csv
 
 source-repository head
   type: git
