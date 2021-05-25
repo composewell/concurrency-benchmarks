@@ -9,11 +9,11 @@ import Control.Concurrent
 import Control.Concurrent.Async
 import Control.Monad (when)
 import System.Random (randomRIO)
+import Streamly.Prelude (IsStream, SerialT)
 import Data.IORef
 
 import Gauge
-import Streamly
-import qualified Streamly.Prelude as S
+import qualified Streamly.Prelude as Stream
 
 -------------------------------------------------------------------------------
 -- Append
@@ -23,18 +23,18 @@ import qualified Streamly.Prelude as S
 append :: IsStream t => Int -> Int -> (t IO Int -> SerialT IO Int) -> IO ()
 append tcount d t = randomRIO (1,1) >>= \x ->
     let work = (\i -> when (d /= 0) (threadDelay d) >> return i)
-    in runStream
+    in Stream.drain
         $ t
-        $ maxBuffer (-1)
-        $ maxThreads (-1)
-        $ S.fromFoldableM $ map work [x..tcount]
+        $ Stream.maxBuffer (-1)
+        $ Stream.maxThreads (-1)
+        $ Stream.fromFoldableM $ map work [x..tcount]
 
 mkBgroup :: Int -> Int -> [Benchmark]
 mkBgroup d n =
     let work = (\i -> when (d /= 0) (threadDelay d) >> return i)
     in [ bgroup "streamly"
-        [ bench "ahead"    $ nfIO $ append n d aheadly
-        , bench "async"    $ nfIO $ append n d asyncly
+        [ bench "ahead"    $ nfIO $ append n d Stream.fromAhead
+        , bench "async"    $ nfIO $ append n d Stream.fromAsync
         -- , bench "wAsync"   $ nfIO $ append n d wAsyncly
         -- , bench "parallel" $ nfIO $ append n d parallely
         ]
@@ -73,10 +73,10 @@ main = do
     , bgroup "delay-5000ms-10k"  (mkBgroup 5000000 10000)
     -- , bgroup "delay-5000ms-100k" (mkBgroup 5000000 100000)
     , bgroup "forkIO-5000ms-10k" $
-    let delay = threadDelay 5000000
+    let delay_ = threadDelay 5000000
         count = 10000 :: Int
         list = [1..count]
-        work i = delay >> return i
+        work i = delay_ >> return i
     in
     [ bench "discard" $ nfIO $ do
         mapM_ (\i -> forkIO $ work i >> return ()) list

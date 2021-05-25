@@ -1,12 +1,9 @@
-resolver: lts-12.5
+resolver: lts-16.11
 packages:
 - '.'
 extra-deps:
-  - streamly-0.5.1
-
-  # for lts-12.0
-  - bench-graph-0.1.3
-  - Chart-1.9
-  - Chart-diagrams-1.9
-  - SVGFonts-1.6.0.3
+- github: composewell/streamly
+  commit: 03cf686ca7e3fe1093b064c9763de8b684cce0f4
+- bench-graph-0.1.4@sha256:6e40a8b3ead71d96c7aaf8ab0cf3c089c139170a748df2532721d43b8043c58f,2388
+- fusion-plugin-types-0.1.0@sha256:0f11bbc445ab8ae3dbbb3d5d2ea198bdb1ac020518b7f4f7579035dc89182438,1506
 rebuild-ghc-options: true
