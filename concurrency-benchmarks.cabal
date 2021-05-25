@@ -19,13 +19,16 @@ description:
   @makecharts results.csv@. Charts are generated in the @charts@ directory.
 
 cabal-version: >= 1.18
-tested-with: GHC==8.2.2, GHC==8.4.3
+tested-with:   GHC==8.6.5
+             , GHC==8.8.4
+             , GHC==8.10.2
 build-type:    Simple
 extra-source-files:
   Changelog.md
   README.md
   stack.yaml
 
+  .github/workflows/packcheck.yml
   appveyor.yml
   run.sh
   cabal.project
