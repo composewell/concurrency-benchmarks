@@ -48,11 +48,11 @@ which means there is no limit:
 
 ```haskell
     let work = (\i -> threadDelay 5000000 >> return i)
-    in runStream
-        $ aheadly
-        $ maxBuffer (-1)
-        $ maxThreads (-1)
-        $ S.fromFoldableM $ map work [1..10000]
+    in Stream.drain
+        $ Stream.fromAhead
+        $ Stream.maxBuffer (-1)
+        $ Stream.maxThreads (-1)
+        $ Stream.fromFoldableM $ map work [1..10000]
 ```
 
 For `async` this is the code that is benchmarked:
@@ -65,8 +65,8 @@ For `async` this is the code that is benchmarked:
 ## Results
 
 These charts compare
-[streamly-0.5.1](https://hackage.haskell.org/package/streamly) and
-`async-2.2.1` on a MacBook Pro with a 2.2 GHz Intel Core i7 processor.
+[streamly-0.7.2](https://github.com/composewell/streamly/tree/03cf686ca7e3fe1093b064c9763de8b684cce0f4)
+and `async-2.2.2`.
 
 When compiling, `-threaded -with-rtsopts "-N"` GHC options were used to enable
 the use of multiple processor cores in parallel.
